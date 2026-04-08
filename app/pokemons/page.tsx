@@ -37,7 +37,7 @@ export default function PokemonsPage() {
 
         <input
           type="text"
-          placeholder="Buscar Pokémon..."
+          placeholder="Buscar Pokémon por nome ou ID..."
           value={busca}
           onChange={(e) => {
             setBusca(e.target.value);
