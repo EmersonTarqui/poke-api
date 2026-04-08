@@ -1,0 +1,79 @@
+"use client";
+import { useState, use } from "react"; 
+import PokemonCard from "./_components/pokemon-card";
+
+interface Pokemon {
+  name: string;
+  id: number;
+}
+
+const apiPokemon = fetch('https://pokeapi.co/api/v2/pokemon?limit=151').then((res) => {
+  return res.json();
+});
+
+export default function PokemonsPage() {
+  const [busca, setBusca] = useState("");
+  const [inicio, setInicio] = useState(0);
+  
+  const itensPorPagina = 15; 
+
+  const data = use(apiPokemon); 
+
+  const pokemons: Pokemon[] = data.results.map((p: { name: string }, i: number) => {
+    return { name: p.name, id: i + 1 };
+  });
+
+  const listaFiltrada = pokemons.filter((p) => 
+    p.name.includes(busca.toLowerCase()) || p.id == Number(busca)
+  );
+
+  const exibidos = listaFiltrada.slice(inicio, inicio + itensPorPagina);
+
+  return (
+    <div className="min-h-screen bg-black text-white p-8">
+      <div className="max-w-4xl mx-auto text-center">
+        
+        <h1 className="text-4xl font-bold mb-8 italic tracking-tighter uppercase">Pokédex</h1>
+
+        <input
+          type="text"
+          placeholder="Buscar Pokémon..."
+          value={busca}
+          onChange={(e) => {
+            setBusca(e.target.value);
+            setInicio(0);
+          }}
+          className="w-full p-4 mb-10 bg-zinc-900 border border-zinc-800 rounded-xl outline-none focus:border-zinc-500"
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
+          {exibidos.map((pokemon) => (
+            <PokemonCard key={pokemon.id} id={pokemon.id} name={pokemon.name} />
+          ))}
+        </div>
+
+
+        {/* botoes */}
+        <div className="flex justify-center gap-4 mt-12 pb-10">
+          
+          <button 
+            disabled={inicio <= 0}
+            onClick={() => setInicio(inicio - itensPorPagina)}
+            className="px-8 py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-bold uppercase text-xs disabled:opacity-20 hover:bg-zinc-800 transition-all active:scale-95"
+          >
+            Anterior
+          </button>
+
+          <button 
+            disabled={inicio + itensPorPagina >= listaFiltrada.length}
+            onClick={() => setInicio(inicio + itensPorPagina)}
+            className="px-8 py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-bold uppercase text-xs disabled:opacity-20 hover:bg-zinc-800 transition-all active:scale-95"
+          >
+            Próximo
+          </button>
+
+        </div>
+      </div>
+    </div>
+  );
+}
