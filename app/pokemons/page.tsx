@@ -13,7 +13,7 @@ const apiPokemon = fetch('https://pokeapi.co/api/v2/pokemon?limit=151').then((re
 
 export default function PokemonsPage() {
   const [busca, setBusca] = useState("");
-  const [inicio, setInicio] = useState(0);
+  const [pagina, setPagina] = useState(1); 
   
   const itensPorPagina = 15; 
 
@@ -27,7 +27,10 @@ export default function PokemonsPage() {
     p.name.includes(busca.toLowerCase()) || p.id == Number(busca)
   );
 
-  const exibidos = listaFiltrada.slice(inicio, inicio + itensPorPagina);
+  //paginacao
+  const final = pagina * itensPorPagina;
+  const começo = final - itensPorPagina;
+  const exibidos = listaFiltrada.slice(começo, final);
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
@@ -41,7 +44,7 @@ export default function PokemonsPage() {
           value={busca}
           onChange={(e) => {
             setBusca(e.target.value);
-            setInicio(0);
+            setPagina(1); // Volta para a página 1 ao buscar
           }}
           className="w-full p-4 mb-10 bg-zinc-900 border border-zinc-800 rounded-xl outline-none focus:border-zinc-500"
         />
@@ -52,21 +55,22 @@ export default function PokemonsPage() {
           ))}
         </div>
 
-
         {/* botoes */}
-        <div className="flex justify-center gap-4 mt-12 pb-10">
+        <div className="flex justify-center items-center gap-6 mt-12 pb-10">
           
           <button 
-            disabled={inicio <= 0}
-            onClick={() => setInicio(inicio - itensPorPagina)}
+            disabled={pagina === 1}
+            onClick={() => setPagina(pagina - 1)}
             className="px-8 py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-bold uppercase text-xs disabled:opacity-20 hover:bg-zinc-800 transition-all active:scale-95"
           >
             Anterior
           </button>
 
+          <span className="text-zinc-500 font-bold">Página {pagina}</span>
+
           <button 
-            disabled={inicio + itensPorPagina >= listaFiltrada.length}
-            onClick={() => setInicio(inicio + itensPorPagina)}
+            disabled={final >= listaFiltrada.length}
+            onClick={() => setPagina(pagina + 1)}
             className="px-8 py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-bold uppercase text-xs disabled:opacity-20 hover:bg-zinc-800 transition-all active:scale-95"
           >
             Próximo
